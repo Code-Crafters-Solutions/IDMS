@@ -15,6 +15,8 @@
 PhoneNum * head = NULL;
 
 u8 CurrentLocation = 0;
+u8 eeprom_ptr = 1;
+u8 NumberOfBlocks = 0;
 u8 size = 0;
 void PhoneList_ADD(u8 * Phonenum)
 {
@@ -50,4 +52,16 @@ void print_numbers(void)
 	{
 			UART_SendByteSynch(eeprom_read_byte(i));
 	}
+}
+
+void AddNumToEEPROM(u8 * PhoneNum)
+{
+	while(*PhoneNum != '\0')
+	{
+		eeprom_write_byte((u8 *)(eeprom_ptr),*PhoneNum);
+		PhoneNum++;
+		eeprom_ptr++;
+		//NumberOfBlocks++;
+	}
+	eeprom_write_byte((u8 *)(0),eeprom_ptr);
 }

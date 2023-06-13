@@ -16,6 +16,7 @@ typedef struct
 
 }PhoneNum;
 
+void AddNumToEEPROM(u8 * PhoneNum);
 
 void PhoneList_INIT();
 
