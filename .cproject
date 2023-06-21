@@ -145,7 +145,12 @@
 								<option id="de.innot.avreclipse.cppcompiler.option.optimize.1778570371" name="Optimization Level" superClass="de.innot.avreclipse.cppcompiler.option.optimize"/>
 								<inputType id="de.innot.avreclipse.cppcompiler.input.1806095862" superClass="de.innot.avreclipse.cppcompiler.input"/>
 							</tool>
-							<tool id="de.innot.avreclipse.tool.linker.winavr.app.debug.1917166483" name="AVR C Linker" superClass="de.innot.avreclipse.tool.linker.winavr.app.debug"/>
+							<tool id="de.innot.avreclipse.tool.linker.winavr.app.debug.1917166483" name="AVR C Linker" superClass="de.innot.avreclipse.tool.linker.winavr.app.debug">
+								<inputType id="de.innot.avreclipse.tool.linker.input.1665945849" name="OBJ Files" superClass="de.innot.avreclipse.tool.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
 							<tool id="de.innot.avreclipse.tool.cpplinker.app.debug.368482566" name="AVR C++ Linker" superClass="de.innot.avreclipse.tool.cpplinker.app.debug">
 								<inputType id="de.innot.avreclipse.tool.cpplinker.input.2145537791" name="OBJ Files" superClass="de.innot.avreclipse.tool.cpplinker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -162,6 +167,7 @@
 					</folderInfo>
 				</configuration>
 			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 		</cconfiguration>
 		<cconfiguration id="de.innot.avreclipse.configuration.app.release.869581103">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="de.innot.avreclipse.configuration.app.release.869581103" moduleId="org.eclipse.cdt.core.settings" name="Release">
@@ -199,7 +205,12 @@
 								<option id="de.innot.avreclipse.cppcompiler.option.optimize.476438506" name="Optimization Level" superClass="de.innot.avreclipse.cppcompiler.option.optimize" value="de.innot.avreclipse.cppcompiler.optimize.size" valueType="enumerated"/>
 								<inputType id="de.innot.avreclipse.cppcompiler.input.1710266852" superClass="de.innot.avreclipse.cppcompiler.input"/>
 							</tool>
-							<tool id="de.innot.avreclipse.tool.linker.winavr.app.release.549142438" name="AVR C Linker" superClass="de.innot.avreclipse.tool.linker.winavr.app.release"/>
+							<tool id="de.innot.avreclipse.tool.linker.winavr.app.release.549142438" name="AVR C Linker" superClass="de.innot.avreclipse.tool.linker.winavr.app.release">
+								<inputType id="de.innot.avreclipse.tool.linker.input.865762547" name="OBJ Files" superClass="de.innot.avreclipse.tool.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
 							<tool id="de.innot.avreclipse.tool.cpplinker.app.release.730727628" name="AVR C++ Linker" superClass="de.innot.avreclipse.tool.cpplinker.app.release">
 								<inputType id="de.innot.avreclipse.tool.cpplinker.input.1481083886" name="OBJ Files" superClass="de.innot.avreclipse.tool.cpplinker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -216,6 +227,7 @@
 					</folderInfo>
 				</configuration>
 			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">

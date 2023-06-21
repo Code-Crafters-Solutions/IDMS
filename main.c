@@ -13,11 +13,14 @@
 #include "PhoneList.h"
 #include "TopWayLCD_Interface.h"
 #include "avr/delay.h"
-
+#include "ADC_Interface.h"
+#include "ADC_Config.h"
+#include "LM35_Interface.h"
 int main(void)
 {
 	 UART_Init();
 	 LCD_Init();
+	 ADC_VidINIT();
 	 u8 Num_size = 0;
 	 u8 *valid = "Valid Number";
 	 u8 *Invalid = "InValid Number";
@@ -31,15 +34,18 @@ int main(void)
 	 u8 sms_size = 0;
 	 u8* p = "";
 	 u8* pp = "";
+	 u16 ADC_Result=0;
 	 while(1)
 	 {
 		 Num_size=0;
-		for(u8 i=0; i<=200; i++)
-		{
-			LCD_SendNum16(In,i);
-			LCD_SendNum16(Out,200-i);
-		}
-
+//		for(u8 i=0; i<=200; i++)
+//		{
+//			LCD_SendNum16(In,i);
+//			LCD_SendNum16(Out,200-i);
+//		}
+		PT100_ReadTemperture(ADC0,&ADC_Result);
+		LCD_SendNum16(In,ADC_Result+50);
+		LCD_SendNum16(Out,ADC_Result);
 		data = "";
 		LCD_GetString(0x00000000,data);
 		ptr = data;
