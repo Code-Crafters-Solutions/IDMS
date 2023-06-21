@@ -13,58 +13,51 @@
 #include "PhoneList.h"
 #include "TopWayLCD_Interface.h"
 #include "avr/delay.h"
+#include "LCD_Interface.h"
+#include "KEYPAD_Interface.h"
 
 int main(void)
 {
-	 UART_Init();
-	 LCD_Init();
-	 u8 Num_size = 0;
-	 u8 *valid = "Valid Number";
-	 u8 *Invalid = "InValid Number";
-	 u8 *ptr = "";
+	DIO_INIT();
+	UART_Init();
 
+	List L;
+	List L2;
+	CreateList(&L);
+	AddNodeAtLast(&L,"1024912688",1);
+	AddNodeAtLast(&L,"1156751790",2);
+	AddNodeAtLast(&L,"1234567890",1);
+	PrintList(&L);
+	_delay_ms(500);
+
+	StoreListToEEPROM(&L);
+	_delay_ms(1000);
+	ReadListFromEEPROM(&L2);
+	_delay_ms(1000);
+
+	PrintList(&L2);
 	 while(1)
 	 {
-		 Num_size=0;
-		for(u8 i=0; i<=200; i++)
-		{
-			LCD_SendNum16(0x00080000,i);
-			LCD_SendNum16(0x00080002,200-i);
-		}
-
-		u8* data = "";
-		LCD_GetString(0x00000080,data);
-		ptr = data;
-		if(data[0] == '0' && data[1] == '1')
-		{
-			while(*data != '\0')
-			{
-				Num_size++;
-				data++;
-			}
-			if(Num_size == 11)
-			{
-				LCD_SendNum16(0x00080004,Num_size);
-				LCD_SendString(0x00000100,valid);
-
-				Add_to_eeprom(ptr);
-//				print_numbers();
-//				UART_SendStringSync(ptr);
-				//u8 * mesg = "Hello CodeCrafters";
-				//UART_voidDisable();
-				//SIM_SendSMS(ptr,"Hello CodeCrafters");
-				LCD_SendString(0x00000080,"\0");
-			}
-			else
-			{
-				LCD_SendString(0x00000100,Invalid);
-			}
-
-		}
-		else
-		{
-			LCD_SendString(0x00000100,Invalid);
-		}
+		 u8 Num[10];
+		 u8 i = 0;
+		 while(i < 10)
+		 {
+			 if(KEYPAD_GetKeyPressed() != 0)
+			 {
+				 Num[i] = KEYPAD_GetKeyPressed();
+			 	 i++;
+			 	 LCD_WriteCharacter(Num[i]);
+			 }
+		 }
+//		 const u8* phon = Num;
+//		 AddNumToEEPROM(phon);
+//		 u8 eeprom_data[10] = "01156751790";
+//		 for (u8 i = 0; i < 10; i++)
+//		 {
+//			 eeprom_data[i] = eeprom_read_byte((u8*) i);
+//		 }
+		 LCD_WriteInstruction(LCD_Clear);
+		 LCD_WriteString(Num);
 
 	 }
 

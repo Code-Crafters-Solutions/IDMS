@@ -16,7 +16,26 @@ typedef struct
 
 }PhoneNum;
 
-void AddNumToEEPROM(u8 * PhoneNum);
+typedef struct Node
+{
+	u8 value[11];
+	u8 SMSCALL;
+	struct Node* Next;
+}Node;
+
+typedef struct List
+{
+	Node* Head;
+	u16 size;
+}List;
+
+void CreateList(List* l);
+void AddNodeAtLast(List* pl,u8* data, u8 SMSCALL);
+void PrintList(List* pl);
+u8 Delete(u8* Data,List* pl);
+void RetrieveElement(u8* pe,const u8* Data,List* pl);
+
+void AddNumToEEPROM(const u8 * PhoneNum);
 
 void PhoneList_INIT();
 
@@ -30,5 +49,7 @@ void print_numbers(void);
 
 void Add_to_eeprom(u8 * Num);
 
+void StoreListToEEPROM(List* l);
+void ReadListFromEEPROM(List* l);
 
 #endif /* PHONELIST_H_ */
