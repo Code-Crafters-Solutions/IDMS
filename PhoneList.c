@@ -12,54 +12,8 @@
 #include <avr/eeprom.h>
 #include "UART_Interface.h"
 
-PhoneNum * head = NULL;
-#define EEPROM_START_ADDRESS 0x00  // The starting address of the EEPROM to write to
-#define EEPROM_END_ADDRESS (EEPROM_START_ADDRESS + 1023)  // The last address to write to
-#define EEPROM_LAST_ADDRESS_ADDRESS 0x0A  // The address of the last used address in the EEPROM
 
-u8 CurrentLocation = 0;
 u8 current_address = 0;
-
-
-
-
-void AddNumToEEPROM(const u8* data)
-{
-    u8 last_address = eeprom_read_byte((u8*)EEPROM_LAST_ADDRESS_ADDRESS);
-    if (last_address == 0xFF)
-    {
-        last_address = EEPROM_START_ADDRESS; // No data written yet, start from the beginning
-    }
-    u8 address = last_address + 1;
-    u8 end_address = address + 9;
-    if (end_address > EEPROM_END_ADDRESS)
-    {
-        // Wrap around to the beginning of the EEPROM if we reach the end
-        address = EEPROM_START_ADDRESS;
-        end_address = address + 9;
-    }
-    while (address <= end_address && *data != '\0')
-    {
-        u8 stored_data = eeprom_read_byte((u8*)address);
-        if (stored_data != *data)
-        {
-            eeprom_write_byte((u8*)address, *data);
-            _delay_us(10);  // Wait for EEPROM write to complete
-            u8 written_data = eeprom_read_byte((u8*)address);
-            while (stored_data != written_data)
-            {
-                // Retry write until data is written correctly
-                eeprom_write_byte((u8*)address, *data);
-                _delay_us(10);  // Wait for EEPROM write to complete
-                written_data = eeprom_read_byte((u8*)address);
-            }
-        }
-        data++;
-        address++;
-    }
-    eeprom_write_byte((u8*)EEPROM_LAST_ADDRESS_ADDRESS, end_address);
-}
-
 
 void CreateList(List* l)
 {
@@ -72,7 +26,7 @@ void AddNodeAtLast(List* pl,u8* data, u8 SMSCALL)
 	//Allocate Node at memory and return its pointer to pn.
 	Node* pn = (Node*)malloc(sizeof(Node));
 	//assin data to pointer
-	for(u8 i = 0;i<10;i++)
+	for(u8 i = 0;i<11;i++)
 	{
 		pn->value[i] = data[i];
 	}
@@ -94,10 +48,22 @@ void AddNodeAtLast(List* pl,u8* data, u8 SMSCALL)
 		current->Next = pn;
 	}
 	pl->size++;
+
+	Node* iterator = pl->Head;
+	while(iterator != NULL)
+	{
+
+		eeprom_write_block((const void*) iterator->value,(void*)current_address,(11 * sizeof(u8)));
+		current_address+= (11 * sizeof(u8));
+		eeprom_write_byte(current_address,iterator->SMSCALL);
+		current_address++;
+		iterator = iterator->Next;
+	}
 }
 
 void PrintList(List* pl)
 {
+	u8 size = pl->size;
 	Node* current;
 	current = pl->Head;
 	if(current == NULL)
@@ -106,7 +72,7 @@ void PrintList(List* pl)
 	}
 	else
 	{
-		while(current)
+		while(size)
 		{
 			for(u8 i = 0;i<11;i++)
 			{
@@ -115,80 +81,114 @@ void PrintList(List* pl)
 			UART_SendByteSynch(current->SMSCALL);
 			UART_SendByteSynch('\n');
 			current = current->Next;
+			size--;
 		}
 	}
+
 }
 
-u8 Delete(u8* Data,List* pl)
+void Delete(u8* Data,List* pl)
 {
-	u8 Data_copy_search[10];
-	u8 Data_copy_head[10];
+	u8 Data_copy_search[11];
+	u8 Data_copy_head[11];
 
 	u8 exist = 0;
+	u8 flag = 0;
 	Node *pn,*qn;
 	pn = pl->Head;
 	qn = pl->Head;
 
-	for(u8 i =0;i<10;i++)
+	for(u8 i =0;i<11;i++)
 		Data_copy_search[i]=Data[i];
 
-	for(u8 i =0;i<10;i++)
+	for(u8 i =0;i<11;i++)
 		Data_copy_head[i]=pl->Head->value[i];
 
-	if(strstr(Data_copy_search, Data_copy_head))
+	for(u8 i=0;i<11;i++)
+	{
+	    if(Data_copy_search[i]==Data_copy_head[i])
+	         flag=0;
+	    else {flag=1; break;}
+	}
+	if(!flag)
 	{
 		exist = 1;
 		pl->Head = pn->Next;
 		free(pn);
-		return 0;
+		pl->size--;
 	}
 
 
 	if(pn == NULL)
 	{
-		printf("\n List Is Empty!\n\n");
+		UART_SendStringSync("\n List Is Empty!\n\n");
 	}
 
 
-	while(pn != NULL)
+	while(pn != NULL && exist != 1)
 	{
-		u8 Data_copy2[10];
-		for(u8 i =0;i<10;i++)
+		u8 Data_copy2[11];
+		for(u8 i =0;i<11;i++)
 			Data_copy2[i]=pn->value[i];
-		if(strstr(Data_copy2, Data_copy_search))
+
+		for(u8 i=0;i<11;i++)
+		{
+		    if(Data_copy_search[i]==Data_copy2[i])
+		         flag=0;
+		    else {flag=1; break;}
+		}
+
+		if(!flag)
 		{
 			exist = 1;
 			qn->Next = pn->Next;
 			free(pn);
+			pl->size--;
 			break;
 		}
 		qn = pn;
 		pn = pn->Next;
 	}
 	if(exist == 0)
-		printf("There is Not element You Entered!\n");
+		UART_SendStringSync("There is Not element You Entered!\n");
 
-	return 0;
+	Node* iterator = pl->Head;
+	while(iterator != NULL)
+	{
+
+		eeprom_write_block((const void*) iterator->value,(void*)current_address,(11 * sizeof(u8)));
+		current_address+= (11 * sizeof(u8));
+		eeprom_write_byte(current_address,iterator->SMSCALL);
+		current_address++;
+		iterator = iterator->Next;
+	}
 }
 
 void RetrieveElement(u8* pe,const u8* Data,List* pl)
 {
-	u8 copy_data[10];
-	u8 copy_head[10];
+	u8 copy_data[11];
+	u8 copy_head[11];
 	Node* pn = pl->Head;
 	u8 *ptr;
 	u8 exist = 0;
-	for(u8 i = 0; i<10 ; i++)
+	u8 flag = 0;
+	for(u8 i = 0; i<11 ; i++)
 	{
 		copy_data[i] = Data[i];
 		copy_head[i] = pn->value[i];
 	}
 
+	for(u8 i=0;i<11;i++)
+	{
+	    if(copy_data[i]==copy_head[i])
+	         flag=0;
+	    else {flag=1; break;}
+	}
 
-	if(strstr(copy_data, copy_head))
+	if(!flag)
 	{
 		exist = 1;
-		for(u8 i =0;i<10;i++)
+		for(u8 i =0;i<11;i++)
 		{
 			pe[i] = pn->value[i];
 		}
@@ -196,13 +196,19 @@ void RetrieveElement(u8* pe,const u8* Data,List* pl)
 
 	while(pn != NULL && exist == 0)
 	{
-		for(u8 i = 0; i<10 ; i++)
+		for(u8 i = 0; i<11 ; i++)
 			copy_head[i] = pn->value[i];
 
-		if(strstr(copy_data ,copy_head))
+		for(u8 i=0;i<11;i++)
+		{
+		    if(copy_data[i]==copy_head[i])
+		         flag=0;
+		    else {flag=1; break;}
+		}
+		if(!flag)
 		{
 			exist = 1;
-			for(u8 i =0;i<10;i++)
+			for(u8 i =0;i<11;i++)
 			{
 				pe[i] = pn->value[i];
 			}
@@ -220,32 +226,34 @@ void RetrieveElement(u8* pe,const u8* Data,List* pl)
 void StoreListToEEPROM(List* l)
 {
 	Node* pn = l->Head;
-	while(pn->Next != NULL)
+	while(pn != NULL)
 	{
-		eeprom_write_block((const void*)&(pn->value),(void*)current_address,(11 * sizeof(u8)));
+
+		eeprom_write_block((const void*) pn->value,(void*)current_address,(11 * sizeof(u8)));
 		current_address+= (11 * sizeof(u8));
 		eeprom_write_byte(current_address,pn->SMSCALL);
 		current_address++;
 		pn = pn->Next;
 	}
-	eeprom_write_byte(current_address,'N');
+	//eeprom_write_byte(current_address,'N');
+
 
 }
 
 
-void ReadListFromEEPROM(List* l)
+void ReadListFromEEPROM(List* l,u8 ListSize)
 {
-	u8 EndList;
-	EndList = eeprom_read_byte((const u8*)current_address);
-	while(EndList != 'N')
+	current_address = 0;
+
+	while(ListSize != 0)
 	{
 		u8 Value[11];
-		eeprom_read_block((void*)Value,(const void*)current_address,(11 * sizeof(u8)));
+		eeprom_read_block((const void*)Value,(const void*)current_address,(11 * sizeof(u8)));
 		current_address+= (11 * sizeof(u8));
 		u8 SMSCALL = eeprom_read_byte((const u8*)current_address);
 		current_address++;
 		AddNodeAtLast(l,Value,SMSCALL);
-		EndList = eeprom_read_byte((const u8*)current_address);
+		ListSize--;
 	}
 
 

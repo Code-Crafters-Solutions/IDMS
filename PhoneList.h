@@ -32,7 +32,7 @@ typedef struct List
 void CreateList(List* l);
 void AddNodeAtLast(List* pl,u8* data, u8 SMSCALL);
 void PrintList(List* pl);
-u8 Delete(u8* Data,List* pl);
+void Delete(u8* Data,List* pl);
 void RetrieveElement(u8* pe,const u8* Data,List* pl);
 
 void AddNumToEEPROM(const u8 * PhoneNum);
@@ -50,6 +50,6 @@ void print_numbers(void);
 void Add_to_eeprom(u8 * Num);
 
 void StoreListToEEPROM(List* l);
-void ReadListFromEEPROM(List* l);
+void ReadListFromEEPROM(List* l,u8 ListSize);
 
 #endif /* PHONELIST_H_ */

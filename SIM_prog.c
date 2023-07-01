@@ -27,13 +27,6 @@ void SIM_voidSendCommand(u8 const *Copy_u8ATCommand)
 
 }
 
-void SIM_voidInit(void)
-{
-//  MUX_voidSwitch(GSM);
-//  USART_disableRXInterrupt();
-	// USART_enuInit();
-}
-
 ES_t SIM_estCheckIfReady(void)
 {
 	ES_t Local_enuerrorState = ES_NOK ;
