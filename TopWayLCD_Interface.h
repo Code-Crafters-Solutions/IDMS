@@ -10,8 +10,11 @@
 
 #define In           0x00080000
 #define Out          0x00080002
+#define In_Num       0x0008000E
+#define Out_Num      0x00080010
 #define Validation   0x00000100
 #define Add          0x0008000A
+#define Remove       0x00080012
 #define List         0x00080008
 #define Phone        0x00000080
 #define Calling_List 0x00000180

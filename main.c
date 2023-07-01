@@ -38,6 +38,8 @@ int main(void)
 		{
 			LCD_SendNum16(In,i);
 			LCD_SendNum16(Out,200-i);
+			LCD_SendNum16(In_Num,i-50);
+			LCD_SendNum16(Out_Num,(200-i)-50);
 		}
 
 		data = "";
@@ -95,6 +97,10 @@ int main(void)
 			LCD_SendNum16(Add,0);
 			LCD_SendNum16(Clear_BUFF,1);
 			valid_phone = 0;
+		}
+		else if(valid_phone && LCD_GetNum16(Remove))
+		{
+
 		}
 
 //		u8* t = (u8*)calling_Array[0];
