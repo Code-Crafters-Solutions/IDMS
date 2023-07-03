@@ -35,6 +35,17 @@ int main(void)
 	 u8* p = "";
 	 u8* pp = "";
 	 u16 ADC_Result=0;
+	 u8* clear = " ";
+
+	 /*Creating phone list*/
+	List L;
+	CreateList(&L);
+	//_delay_ms(500);
+
+	for(u8 i =0; i < (27*2); i++)
+	{
+		LCD_SendString(CList_address + (128*i) ,clear);
+	}
 	 while(1)
 	 {
 		 Num_size=0;
@@ -81,52 +92,39 @@ int main(void)
 		/*Checking if user press ADD button and insert the number to its correct list*/
 		if(valid_phone && LCD_GetNum16(Add))
 		{
-			list = LCD_GetNum16(List);
-			if(list == 1)
+			list = LCD_GetNum16(L_type);
+			if(list == Calling_list)
 			{
-				calling_Array[calling_size] = ptr;
-				p = (u8*)calling_Array[calling_size];
-				LCD_SendString(Phone,p);
-				LCD_SendString(Calling_List + (128*calling_size), p);
-				LCD_SendNum16(0x0008000C,list);//test
-				calling_size++;
-			}else if(list == 2)
+				LCD_SendString(Phone,ptr);
+				LCD_SendNum16(0x0008000C,list);//just for test
+				AddNodeAtLast(&L,ptr,list);
+
+			}else if(list == SMS_list)
 			{
-				sms_Array[sms_size] = ptr;
-				p = (u8*)sms_Array[sms_size];
-				LCD_SendString(Phone,p);
-				p = (u8*)sms_Array[sms_size];
-				LCD_SendString(SMS_List + (128*sms_size) , p);
-				LCD_SendNum16(0x0008000C,list);//test
-				sms_size++;
+				LCD_SendString(Phone,ptr);
+				LCD_SendNum16(0x0008000C,list);//just for test
+				AddNodeAtLast(&L,ptr,list);
 			}
+
 			LCD_SendNum16(Add,0);
 			LCD_SendNum16(Clear_BUFF,1);
 			valid_phone = 0;
 		}
-		else if(valid_phone && LCD_GetNum16(Remove))
+		else if(valid_phone && LCD_GetNum16(Remove)) /*Checking if user want to remove specific number and remove it*/
 		{
+			Delete(ptr,&L);
+			LCD_SendNum16(Remove,0);
+			LCD_SendNum16(Clear_BUFF,1);
+			valid_phone = 0;
 
+			LCD_SendString(CList_address ,clear);
+			for(u8 i =0; i < (27*2); i++)
+			{
+				LCD_SendString(CList_address + (128*i) ,clear);
+			}
 		}
 
-//		u8* t = (u8*)calling_Array[0];
-////		u8* tt = (u8*)calling_Array[1];
-////		u8* ttt = (u8*)calling_Array[2];
-//		LCD_SendString(Calling_List , t);
-//
-//		t = (u8*)calling_Array[1];
-//		LCD_SendString(Calling_List + 128, t);
-//
-//		t = (u8*)calling_Array[2];
-//		LCD_SendString(Calling_List +(128*2), t);
-
-//		for(u8 i =0 ; i<calling_size ; i++)
-//		{
-//			//u8* p = (u8*)calling_Array[i];
-//			LCD_SendString(Calling_List + (128*i) , p);
-//		}
-
-
+		PrintList(&L,CList_address , SList_address);
 	 }
 
 	 return 0;
