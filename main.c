@@ -34,7 +34,8 @@ int main(void)
 	 u8 sms_size = 0;
 	 u8* p = "";
 	 u8* pp = "";
-	 u16 ADC_Result=0;
+	 u16 ADC_Result1=0;
+	 u16 ADC_Result2=0;
 	 u8* clear = " ";
 
 	 /*Creating phone list*/
@@ -46,9 +47,11 @@ int main(void)
 	{
 		LCD_SendString(CList_address + (128*i) ,clear);
 	}
+	ReadListFromEEPROM(&L);
 	 while(1)
 	 {
 		 Num_size=0;
+		 /*Just for test */
 		for(u8 i=0; i<=200; i++)
 		{
 			LCD_SendNum16(In,i);
@@ -56,9 +59,13 @@ int main(void)
 			LCD_SendNum16(In_Num,i-50);
 			LCD_SendNum16(Out_Num,(200-i)-50);
 		}
-		//PT100_ReadTemperture(ADC0,&ADC_Result);
-		//LCD_SendNum16(In,ADC_Result+50);
-		//LCD_SendNum16(Out,ADC_Result);
+//		PT100_ReadTemperture(ADC0,&ADC_Result1);
+//		PT100_ReadTemperture(ADC1,&ADC_Result2);
+//		LCD_SendNum16(In,ADC_Result1+50);
+//		LCD_SendNum16(Out,ADC_Result1+50);
+//		LCD_SendNum16(In_Num,ADC_Result1);
+//		LCD_SendNum16(Out_Num,ADC_Result2);
+
 		data = "";
 		LCD_GetString(0x00000000,data);
 		ptr = data;
@@ -109,6 +116,7 @@ int main(void)
 			LCD_SendNum16(Add,0);
 			LCD_SendNum16(Clear_BUFF,1);
 			valid_phone = 0;
+			StoreListToEEPROM(&L);
 		}
 		else if(valid_phone && LCD_GetNum16(Remove)) /*Checking if user want to remove specific number and remove it*/
 		{
@@ -116,6 +124,7 @@ int main(void)
 			LCD_SendNum16(Remove,0);
 			LCD_SendNum16(Clear_BUFF,1);
 			valid_phone = 0;
+			StoreListToEEPROM(&L);
 
 			LCD_SendString(CList_address ,clear);
 			for(u8 i =0; i < (27*2); i++)

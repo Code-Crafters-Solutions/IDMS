@@ -50,6 +50,6 @@ void print_numbers(void);
 void Add_to_eeprom(u8 * Num);
 
 void StoreListToEEPROM(List* l);
-void ReadListFromEEPROM(List* l,u8 ListSize);
+void ReadListFromEEPROM(List* l);
 
 #endif /* PHONELIST_H_ */
